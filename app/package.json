@@ -1,0 +1,42 @@
+{
+  "name": "kayaka-app",
+  "version": "1.0.0",
+  "description": "Kayaka sample application for DevOps assignment",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:coverage": "vitest run tests/unit --coverage",
+    "typecheck": "node --check src/app.js && node --check src/index.js",
+    "lint": "eslint src/ tests/",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.12.0",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "morgan": "^1.10.0",
+    "prom-client": "^15.1.0",
+    "winston": "^3.11.0",
+    "dotenv": "^16.4.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.11",
+    "supertest": "^6.3.3",
+    "nock": "^13.5.0",
+    "eslint": "^8.56.0",
+    "@eslint/js": "^8.56.0",
+    "globals": "^15.0.0",
+    "nodemon": "^3.0.0"
+  }
+}

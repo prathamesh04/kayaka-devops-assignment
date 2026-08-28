@@ -1,0 +1,27 @@
+# Node.js
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Docker
+*.docker
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform/
+*.tfvars
+!environments/staging.tfvars
+!environments/production.tfvars
+terraform/lambda/dist/
+
+# Logs
+*.log
+/var/log/
+
+# OS
+.DS_Store

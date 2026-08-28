@@ -1,0 +1,30 @@
+[
+  {
+    "name": "app",
+    "image": "ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/kayaka-app:latest",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 3000,
+        "hostPort": 3000,
+        "protocol": "tcp"
+      }
+    ],
+    "environment": [
+      { "name": "NODE_ENV", "value": "production" },
+      { "name": "PORT", "value": "3000" },
+      { "name": "LOG_LEVEL", "value": "info" }
+    ],
+    "secrets": [
+      { "name": "DATABASE_URL", "valueFrom": "arn:aws:secretsmanager:ap-south-1:ACCOUNT_ID:secret:kayaka-production/db/credentials" }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/kayaka-production/app",
+        "awslogs-region": "ap-south-1",
+        "awslogs-stream-prefix": "app"
+      }
+    }
+  }
+]

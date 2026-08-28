@@ -1,0 +1,109 @@
+{
+  "start": [
+    {
+      "type": "explanation",
+      "value": "This CloudWatch Dashboard shows the core infrastructure metrics for the Kayaka staging and production environments."
+    }
+  ],
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ECS", "CPUUtilization", "ServiceName", "kayaka-staging-service", { "stat": "Average", "label": "Staging CPU" }],
+          ["AWS/ECS", "MemoryUtilization", "ServiceName", "kayaka-staging-service", { "stat": "Average", "label": "Staging Mem" }],
+          ["AWS/ECS", "CPUUtilization", "ServiceName", "kayaka-production-service", { "stat": "Average", "label": "Prod CPU" }],
+          ["AWS/ECS", "MemoryUtilization", "ServiceName", "kayaka-production-service", { "stat": "Average", "label": "Prod Mem" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 60,
+        "title": "ECS Resource Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "RequestCount", { "stat": "Sum", "label": "Requests" }],
+          ["AWS/ApplicationELB", "TargetResponseTime", { "stat": "p95", "label": "p95 Latency" }],
+          ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", { "stat": "Sum", "label": "5XX" }],
+          ["AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", { "stat": "Sum", "label": "4XX" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 300,
+        "title": "ALB Requests, Latency & Errors"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/RDS", "CPUUtilization", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Average", "label": "Staging DB CPU" }],
+          ["AWS/RDS", "FreeableMemory", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Average", "label": "Staging Free Mem", "yAxis": "right" }],
+          ["AWS/RDS", "DatabaseConnections", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Sum", "label": "Staging Connections" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 120,
+        "title": "RDS Instance Metrics"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/RDS", "ReadIOPS", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Average", "label": "Read IOPS" }],
+          ["AWS/RDS", "WriteIOPS", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Average", "label": "Write IOPS" }],
+          ["AWS/RDS", "Queries", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Sum", "label": "Queries/sec" }],
+          ["AWS/RDS", "Deadlocks", "DBClusterIdentifier", "kayaka-staging-db", { "stat": "Sum", "label": "Deadlocks" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 120,
+        "title": "RDS Throughput Metrics"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 12,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", "app/kayaka-staging-alb", { "stat": "Average", "label": "Staging Healthy" }],
+          ["AWS/ApplicationELB", "UnHealthyHostCount", "LoadBalancer", "app/kayaka-staging-alb", { "stat": "Average", "label": "Staging Unhealthy" }],
+          ["AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", "app/kayaka-production-alb", { "stat": "Average", "label": "Prod Healthy" }],
+          ["AWS/ApplicationELB", "UnHealthyHostCount", "LoadBalancer", "app/kayaka-production-alb", { "stat": "Average", "label": "Prod Unhealthy" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 120,
+        "title": "Target Health"
+      }
+    }
+  ]
+}

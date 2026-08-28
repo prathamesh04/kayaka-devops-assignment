@@ -1,0 +1,96 @@
+{
+  "start": [
+    {
+      "type": "explanation",
+      "value": "Application-level metrics exported by the /metrics endpoint and collected via CloudWatch EMF or Prometheus-compatible scraping. High request rate, high error rate and latency spikes are shown together."
+    }
+  ],
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [{ "expression": "SUM(METRICS())", "label": "Total requests", "id": "r1", "period": 60 }],
+          ["AWS/CloudWatch", "kayaka_http_requests_total", { "stat": "Sum", "label": "Request count" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 60,
+        "title": "Request Rate"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/CloudWatch", "kayaka_http_request_duration_seconds", { "stat": "p50", "label": "p50" }],
+          ["AWS/CloudWatch", "kayaka_http_request_duration_seconds", { "stat": "p95", "label": "p95" }],
+          ["AWS/CloudWatch", "kayaka_http_request_duration_seconds", { "stat": "p99", "label": "p99" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 120,
+        "title": "API Latency (percentiles)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", { "stat": "Sum", "label": "4XX errors" }],
+          ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", { "stat": "Sum", "label": "5XX errors" }],
+          ["AWS/ApplicationELB", "HTTPCode_ELB_5XX_Count", { "stat": "Sum", "label": "ALB 5XX" }]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "ap-south-1",
+        "period": 300,
+        "title": "Error Rate"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ECS", "CPUUtilization", "ServiceName", "kayaka-production-service", { "stat": "Average", "label": "CPU" }],
+          ["AWS/ECS", "MemoryUtilization", "ServiceName", "kayaka-production-service", { "stat": "Average", "label": "Memory" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "ap-south-1",
+        "period": 60,
+        "title": "Pod Resource Usage vs. Requests"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 12,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE '/ecs/kayaka-production/app' | fields @timestamp, @message | sort @timestamp desc | limit 20",
+        "region": "ap-south-1",
+        "title": "Latest Application Logs"
+      }
+    }
+  ]
+}
