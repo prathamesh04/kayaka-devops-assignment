@@ -66,8 +66,10 @@ End-to-end infrastructure provisioning, deployment automation, monitoring and lo
 │   ├── monitoring.tf          # Dashboards + alarms + SNS
 │   ├── outputs.tf              # Key resource references
 │   └── environments/           # staging.tfvars / production.tfvars
+├── bootstrap/
+│   └── oidc.tf                 # GitHub Actions OIDC provider + staging/prod IAM roles
 ├── .github/workflows/
-│   ├── ci.yml                  # Tests + vuln scan + terraform validate
+│   ├── ci.yml                  # Tests + vuln scan + terraform validate/plan
 │   ├── deploy-staging.yml      # Auto-deploy on merge to main
 │   └── deploy-production.yml   # Manual approval required
 ├── monitoring/
@@ -190,7 +192,7 @@ Every PR to `main` and every push runs:
 3. **Integration tests** against a real PostgreSQL 15 service container (GitHub Actions service)
 4. **Dependency vulnerability scan** — `npm audit --audit-level=high` + OWASP Dependency-Check, report uploaded as artifact
 5. **Container vulnerability scan** — `trivy` on the built image; HIGH/CRITICAL reported to GitHub Security tab, **build fails on CRITICAL**
-6. **Terraform validate** — `init -backend=false`, `validate`, `fmt -check`, and a **plan for staging** uploaded as artifact
+6. **Terraform validate** — `init`, `validate`, `fmt -check`, plus a full **plan for staging** (via OIDC, staged state) uploaded as artifact
 
 ### Merge to `main` — `deploy-staging.yml`
 
@@ -211,6 +213,34 @@ On merge to main, automatically deploys to **staging**:
 - Slack notifications on both success and failure
 
 > GitHub **Environments** provide the approval mechanism — no extra tooling needed. Secrets like `DB_USERNAME`/`DB_PASSWORD` and `SLACK_WEBHOOK_URL` are stored as GitHub encrypted secrets, per environment.
+
+### One-time GitHub Actions setup (required before pipelines run)
+
+The pipelines assume an AWS **OIDC role** per environment and a handful of repository secrets. Without these, the very first job fails with `Could not assume role with OIDC: Request ARN is invalid` (a missing `AWS_ACCOUNT_ID`).
+
+**1. Apply the OIDC provider + IAM roles** (run once with account-level credentials):
+
+```bash
+cd bootstrap
+terraform init        # uses the same S3 backend and lock table
+terraform apply
+# creates: token.actions.githubusercontent.com OIDC provider,
+#          roles github-actions-staging and github-actions-production
+# Trust is scoped to repo:prathamesh04/kayaka-devops-assignment:*
+```
+
+**2. Add GitHub repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|---|---|
+| `AWS_ACCOUNT_ID` | 12-digit AWS account ID (used to build the role ARN) |
+| `DB_USERNAME` / `DB_PASSWORD` | RDS admin credentials, injected via `TF_VAR_*` |
+| `STAGING_URL` / `PRODUCTION_URL` | ALB endpoints for smoke/health checks |
+| `SLACK_WEBHOOK_URL` | Notifications channel |
+
+The `staging` / `production` GitHub **Environments** can additionally gate with required reviewers (the production pipeline's approval gate).
+
+**3. Push to `main`** — `ci.yml` runs on the PR; merging triggers the staging deploy, and a completed staging run with `workflow_dispatch` triggers production.
 
 ---
 
