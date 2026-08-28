@@ -197,6 +197,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Require AWS_ACCOUNT_ID secret
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          if [[ -z "$AWS_ACCOUNT_ID" ]]; then
+            echo "::error::Set the AWS_ACCOUNT_ID repository secret to your 12-digit AWS account ID."
+            echo "::error::Then create the OIDC roles: cd bootstrap && terraform init && terraform apply"
+            exit 1
+          fi
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
